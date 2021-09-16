@@ -1,39 +1,28 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace StringSortFilter.Pages
+namespace PrimeNumberFilter.Classes
 {
-    public class IndexModel : PageModel
+    public class Functions
     {
-        private readonly ILogger<IndexModel> _logger;
-        public string ResultText { get; set; }
-        public IndexModel(ILogger<IndexModel> logger)
+
+        public Functions()
         {
-            _logger = logger;
+
         }
-        
-        public void OnGet()
+
+        public string NewText(string oldText,string sorting)
         {
-           
             
-        }
-        public void OnPost()
-        {
-            ResultText = Request.Form[nameof(ResultText)];
-            if (ResultText == null)
-                ResultText = "";
-            if (ResultText.Length > 0)
+            if (oldText.Length > 0)
             {
                 List<string> newLines = new List<string>();
                 string newLine = "";
-                List<string> lines = ResultText.Split(Environment.NewLine).ToList();
+                List<string> lines = oldText.Split(Environment.NewLine).ToList();
                 foreach (string line in lines)
                 {
                     var numbers = ExtractIntegers(line);
@@ -54,14 +43,18 @@ namespace StringSortFilter.Pages
 
                 }
                 newLines.Add(newLine);
-                ResultText = "";
+                oldText = "";
+                if (sorting == "Asc")
+                    newLines = newLines.OrderBy(x => x).ToList();
                 foreach (string l in newLines)
                 {
-                    ResultText += l + Environment.NewLine;
+                    oldText += l + Environment.NewLine;
                 }
             }
+
+            return oldText;
         }
-        private List<long> ExtractIntegers(string line)
+        public List<long> ExtractIntegers(string line)
         {
             try
             {
@@ -82,21 +75,19 @@ namespace StringSortFilter.Pages
                 return numbers;
             }
             catch (Exception ex)
-            {
-                ResultText = "Error extracting numbers from string";
+            {               
                 return null;
             }
-           
-            
-        }
 
+
+        }
         public bool IsPrime(long num)
         {
             bool prime = true;
             // we just need to check for the odd numbers up to the root of the number itself
             long sqrt = (int)Math.Sqrt(num);
             // first lets check if its an even number
-            if ((num % 2 ) == 0 && num != 2) 
+            if ((num % 2) == 0 && num != 2)
             {
                 return false;
             }
@@ -111,9 +102,10 @@ namespace StringSortFilter.Pages
                     }
                 }
             }
-               
+
             return prime;
         }
-
     }
+
+   
 }
